@@ -1,0 +1,91 @@
+﻿@{
+    if (Session["account"] == null || string.IsNullOrWhiteSpace(Session["account"].ToString()))
+    {
+        Response.Redirect("~/Home/Index");
+    }
+}
+    <body onload="fnOnload()">
+        <table border="1">
+            <tr>
+                <td>    </td>
+                <td>Order ID</td>
+                <td>Order Item</td>
+                <td>Price</td>
+                <td>Cost</td>
+                <td>Status</td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" id="Product1"></td>
+                <td>A20202026001</td>
+                <td><button type="button" onclick="fnProduct('1')">Product1</button></td>
+                <td>100</td>
+                <td>90</td>
+                <td id="Product1Text">Payment completed</td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" id="Product2"></td>
+                <td>A20202023001</td>
+                <td><button type="button" onclick="fnProduct('2')">Product2</button></td>
+                <td>120</td>
+                <td>100</td>
+                <td id="Product2Text">Payment completed</td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" id="Product3"></td>
+                <td>A20202026002</td>
+                <td><button type="button" onclick="fnProduct('3')">Product3</button></td>
+                <td>200</td>
+                <td>150</td>
+                <td id="Product3Text">Payment completed</td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" id="Product4"></td>
+                <td>A20202024003</td>
+                <td><button type="button" onclick="fnProduct('4')">Product4</button></td>
+                <td>250</td>
+                <td>120</td>
+                <td id="Product4Text">Payment completed</td>
+            </tr>
+        </table>
+        <button type="button" onclick="fnReceiveData()">Confirm</button>
+    </body>
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script>
+    function fnOnload() {
+        var str = "@ViewBag.Product";
+        for (var i = 1; i < 5; i++) {
+            $("#Product" + i + "Text")[0].innerHTML = str.split(',')[i - 1];
+        }
+    }
+    function fnReceiveData() {
+        $.ajax({
+            type: "POST",
+            url: "Check",
+            dataType: "json",
+            data: {
+                Product1: $("#Product1")[0].checked ? "To be shipped" : "Payment completed",
+                Product2: $("#Product2")[0].checked ? "To be shipped" : "Payment completed",
+                Product3: $("#Product3")[0].checked ? "To be shipped" : "Payment completed",
+                Product4: $("#Product4")[0].checked ? "To be shipped" : "Payment completed"
+            },
+            success: function (data) {
+                for (var i = 1; i < 5; i++) {
+                    $("#Product" + i + "Text")[0].innerHTML = data.responseText.split(',')[i - 1];
+                }
+            }
+        })
+    }
+    function fnProduct(str) {
+        $.ajax({
+            type: "POST",
+            url: "Product",
+            dataType: "json",
+            data: {
+                Product: str
+            },
+            success: function (data) {
+                alert(data.responseText);
+            }
+        })
+    }
+</script>
